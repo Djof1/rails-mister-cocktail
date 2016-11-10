@@ -1,5 +1,5 @@
 class DosesController < ApplicationController
-  before_action :set_dose, only: [:show, :edit, :update, :destroy]
+  before_action :set_cocktail, only: [:new, :show, :create, :edit, :update]
 
   # GET /doses
   # GET /doses.json
@@ -24,17 +24,12 @@ class DosesController < ApplicationController
   # POST /doses
   # POST /doses.json
   def create
-    @dose = Dose.new(dose_params)
-
-    respond_to do |format|
+    @dose = @cocktail.doses.build(dose_params)
       if @dose.save
-        format.html { redirect_to @dose, notice: 'Dose was successfully created.' }
-        format.json { render :show, status: :created, location: @dose }
+      redirect_to cocktail_path(@cocktail.id)
       else
-        format.html { render :new }
-        format.json { render json: @dose.errors, status: :unprocessable_entity }
+      render :new
       end
-    end
   end
 
   # PATCH/PUT /doses/1
@@ -54,21 +49,25 @@ class DosesController < ApplicationController
   # DELETE /doses/1
   # DELETE /doses/1.json
   def destroy
+    @dose = Dose.find(params['id'])
+    id = @dose.cocktail_id
     @dose.destroy
-    respond_to do |format|
-      format.html { redirect_to doses_url, notice: 'Dose was successfully destroyed.' }
-      format.json { head :no_content }
-    end
+
+    redirect_to cocktail_path(id)
+    # respond_to do |format|
+    #   format.html { redirect_to doses_url, notice: 'Dose was successfully destroyed.' }
+    #   format.json { head :no_content }
+    # end
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
-    def set_dose
-      @dose = Dose.find(params[:id])
+    def set_cocktail
+      @cocktail = Cocktail.find(params['cocktail_id'])
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def dose_params
-      params.require(:dose).permit(:descritption, :cocktail_id, :ingredient_id)
+      params.require(:dose).permit(:description, :cocktail_id, :ingredient_id)
     end
 end
